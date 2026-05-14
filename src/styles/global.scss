@@ -1,0 +1,41 @@
+/* ============================================================
+   ÄR DET KÖ — design tokens, reset, base typography
+   ============================================================ */
+
+:root {
+  /* Calm Swedish sea-blue palette */
+  --bg:        oklch(0.965 0.012 235);
+  --ink:       oklch(0.18  0.030 245);
+  --ink-soft:  oklch(0.52  0.020 245);
+  --ja:        oklch(0.62  0.16  60);   /* warm amber for "Ja" */
+  --nej:       oklch(0.55  0.13  160);  /* saturated green for "Nej" */
+
+  --font-sans: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-display: "Playfair Display", Georgia, serif;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  font-family: var(--font-sans);
+  background: var(--bg);
+  color: var(--ink);
+  min-height: 100dvh;
+  line-height: 1.5;
+}
+
+a {
+  color: inherit;
+}
