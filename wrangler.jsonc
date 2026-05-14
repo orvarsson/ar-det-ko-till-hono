@@ -13,8 +13,8 @@
   "kv_namespaces": [
     {
       "binding": "QUEUE_CACHE",
-      "id": "REPLACE_WITH_KV_NAMESPACE_ID",
-      "preview_id": "REPLACE_WITH_PREVIEW_KV_NAMESPACE_ID"
+      "id": "2d33fc56cb964089a8944d9a0c0a88f6",
+      "preview_id": "2af300bd77ce47a98da79c8d82d392fa"
     }
   ],
   // GOOGLE_MAPS_API_KEY is stored as a secret, not a var.
@@ -25,7 +25,7 @@
       "kv_namespaces": [
         {
           "binding": "QUEUE_CACHE",
-          "id": "REPLACE_WITH_KV_NAMESPACE_ID"
+          "id": "2d33fc56cb964089a8944d9a0c0a88f6"
         }
       ],
       "routes": [

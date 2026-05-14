@@ -1,6 +1,7 @@
 import type { DirectionConfig } from "./directions";
 
-const ROUTES_ENDPOINT = "https://routes.googleapis.com/directions/v2:computeRoutes";
+const ROUTES_ENDPOINT =
+  "https://routes.googleapis.com/directions/v2:computeRoutes";
 
 export type RouteSample = {
   durationSec: number;
@@ -8,10 +9,12 @@ export type RouteSample = {
 };
 
 function parseDurationSec(raw: unknown): number {
-  if (typeof raw !== "string") throw new Error(`Unexpected duration value: ${String(raw)}`);
+  if (typeof raw !== "string")
+    throw new Error(`Unexpected duration value: ${String(raw)}`);
   // Routes API returns strings like "742s".
   const value = Number.parseInt(raw.replace(/s$/, ""), 10);
-  if (!Number.isFinite(value)) throw new Error(`Could not parse duration: ${raw}`);
+  if (!Number.isFinite(value))
+    throw new Error(`Could not parse duration: ${raw}`);
   return value;
 }
 
@@ -27,12 +30,17 @@ export async function fetchRouteSample(
     },
     destination: {
       location: {
-        latLng: { latitude: config.destination.lat, longitude: config.destination.lng },
+        latLng: {
+          latitude: config.destination.lat,
+          longitude: config.destination.lng,
+        },
       },
     },
     travelMode: "DRIVE",
+    // TRAFFIC_AWARE uses live traffic and defaults departureTime to "now".
+    // Don't set departureTime explicitly — Google rejects timestamps that
+    // aren't strictly in the future, which is fragile across clock skew.
     routingPreference: "TRAFFIC_AWARE",
-    departureTime: new Date().toISOString(),
   };
 
   const response = await fetch(ROUTES_ENDPOINT, {
