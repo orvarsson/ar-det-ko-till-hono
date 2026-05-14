@@ -7,9 +7,8 @@
   "observability": {
     "enabled": true
   },
-  // KV namespace cache the queue status per direction.
+  // KV namespace caches the queue status per direction.
   // Create one with: wrangler kv namespace create QUEUE_CACHE
-  // Then paste the returned id below (and a preview_id for local dev).
   "kv_namespaces": [
     {
       "binding": "QUEUE_CACHE",
@@ -20,24 +19,14 @@
   // GOOGLE_MAPS_API_KEY is stored as a secret, not a var.
   // Set it with: wrangler secret put GOOGLE_MAPS_API_KEY
   // For local dev, drop it in .dev.vars (gitignored).
-  "env": {
-    "production": {
-      "kv_namespaces": [
-        {
-          "binding": "QUEUE_CACHE",
-          "id": "2d33fc56cb964089a8944d9a0c0a88f6"
-        }
-      ],
-      "routes": [
-        {
-          "pattern": "ärdetkötillhönö.se",
-          "custom_domain": true
-        },
-        {
-          "pattern": "ärdetkötillvarholmen.se",
-          "custom_domain": true
-        }
-      ]
+  "routes": [
+    {
+      "pattern": "ärdetkötillhönö.se",
+      "custom_domain": true
+    },
+    {
+      "pattern": "ärdetkötillvarholmen.se",
+      "custom_domain": true
     }
-  }
+  ]
 }

@@ -45,7 +45,7 @@ Unknown hosts fall back to `to-hono` so plain `localhost` still works.
 # One-time setup
 wrangler kv namespace create QUEUE_CACHE                  # paste id into wrangler.jsonc
 wrangler kv namespace create QUEUE_CACHE --preview        # paste preview_id
-wrangler secret put GOOGLE_MAPS_API_KEY --env production  # paste key
+wrangler secret put GOOGLE_MAPS_API_KEY                   # paste key
 
 # Manual deploy
 npm run deploy
@@ -53,8 +53,8 @@ npm run deploy
 
 ### Auto-deploy via GitHub Actions
 
-`.github/workflows/deploy.yml` runs typecheck + build + `wrangler deploy
---env production` on every push to `main`. Add these repository secrets in
+`.github/workflows/deploy.yml` runs build + typecheck + `wrangler deploy`
+on every push to `main`. Add these repository secrets in
 GitHub (Settings → Secrets and variables → Actions):
 
 - `CLOUDFLARE_API_TOKEN` — create at
