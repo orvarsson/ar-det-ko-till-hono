@@ -11,7 +11,7 @@ export type RouteSample = {
 function parseDurationSec(raw: unknown): number {
   if (typeof raw !== "string")
     throw new Error(`Unexpected duration value: ${String(raw)}`);
-  // Routes API returns strings like "742s".
+  // Routes API returns strings like "742s". :)
   const value = Number.parseInt(raw.replace(/s$/, ""), 10);
   if (!Number.isFinite(value))
     throw new Error(`Could not parse duration: ${raw}`);
