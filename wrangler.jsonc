@@ -19,13 +19,15 @@
   // GOOGLE_MAPS_API_KEY is stored as a secret, not a var.
   // Set it with: wrangler secret put GOOGLE_MAPS_API_KEY
   // For local dev, drop it in .dev.vars (gitignored).
+  // Use Punycode forms — Cloudflare's API stores IDN zones in Punycode and
+  // rejects the Unicode form when attaching custom domains.
   "routes": [
     {
-      "pattern": "ärdetkötillhönö.se",
+      "pattern": "xn--rdetktillhn-k8a3vfb.se",
       "custom_domain": true
     },
     {
-      "pattern": "ärdetkötillvarholmen.se",
+      "pattern": "xn--rdetktillvarholmen-ktb97a.se",
       "custom_domain": true
     }
   ]
