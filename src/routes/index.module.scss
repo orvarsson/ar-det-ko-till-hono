@@ -31,8 +31,12 @@
   font-family: var(--font-display);
   font-weight: 900;
   font-size: clamp(8rem, 25vw, 16rem);
-  line-height: 0.95;
+  // Display weight + tight line-height means "j" in "Nej" overflows the line
+  // box. 1.05 keeps it visually tight while containing the descender so the
+  // meta line below doesn't collide.
+  line-height: 1.05;
   letter-spacing: -0.04em;
+  margin-block: 0.05em;
 
   &.ja {
     color: var(--ja);
