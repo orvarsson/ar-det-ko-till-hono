@@ -27,7 +27,15 @@
       "custom_domain": true
     },
     {
+      "pattern": "www.xn--rdetktillhn-k8a3vfb.se",
+      "custom_domain": true
+    },
+    {
       "pattern": "xn--rdetktillvarholmen-ktb97a.se",
+      "custom_domain": true
+    },
+    {
+      "pattern": "www.xn--rdetktillvarholmen-ktb97a.se",
       "custom_domain": true
     }
   ]
