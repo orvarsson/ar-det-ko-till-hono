@@ -25,17 +25,28 @@ export const Route = createFileRoute("/")({
 function QueuePage() {
   const data = Route.useLoaderData() as LoadedStatus;
   const { question, status } = data;
-
   const answer = status?.status;
-  const answerClass = answer === "Ja" ? styles.ja : answer === "Nej" ? styles.nej : styles.unknown;
+  const answerClass =
+    answer === "Ja"
+      ? styles.ja
+      : answer === "Nej"
+        ? styles.nej
+        : styles.unknown;
   const display = answer ?? "Vet ej just nu";
+  const ferryLine =
+    answer === "Ja" && status
+      ? ferryEstimateLine(status.durationSec - status.staticDurationSec)
+      : null;
 
   return (
     <div className={styles.page}>
       <main className={styles.main}>
         <p className={styles.question}>{question}</p>
         <h1 className={`${styles.answer} ${answerClass}`}>{display}</h1>
-        <p className={styles.meta}>{buildFreshnessLine(status?.fetchedAt, status?.stale)}</p>
+        {ferryLine && <p className={styles.estimate}>{ferryLine}</p>}
+        <p className={styles.meta}>
+          {buildFreshnessLine(status?.fetchedAt, status?.stale)}
+        </p>
       </main>
 
       <footer className={styles.footer}>
@@ -48,13 +59,30 @@ function QueuePage() {
   );
 }
 
-function buildFreshnessLine(fetchedAt: string | undefined, stale: boolean | undefined): string {
+function ferryEstimateLine(delaySec: number): string {
+  const min = Math.max(0, Math.round(delaySec / 60));
+  if (min <= 2) return "..men, du borde komma med färjan ändå!";
+  if (min <= 4) return "Du kommer antagligen att behöva vänta 1 färja";
+  if (min <= 7) return "Du kommer antagligen att behöva vänta 2 färjor";
+  if (min <= 10) return "Du kommer antagligen att behöva vänta 3 färjor";
+  if (min <= 15) return "Du kommer antagligen att behöva vänta 4 färjor";
+  return "Du kommer antagligen att behöva vänta ett bra tag";
+}
+
+function buildFreshnessLine(
+  fetchedAt: string | undefined,
+  stale: boolean | undefined,
+): string {
   if (!fetchedAt) return "Ingen färsk data tillgänglig.";
-  const minutes = Math.max(0, Math.round((Date.now() - new Date(fetchedAt).getTime()) / 60_000));
-  const base = minutes === 0
-    ? "Uppdaterad just nu"
-    : minutes === 1
-      ? "Uppdaterad för 1 minut sedan"
-      : `Uppdaterad för ${minutes} minuter sedan`;
-  return stale ? `${base} (gammal data — Google svarade inte)` : base;
+  const minutes = Math.max(
+    0,
+    Math.round((Date.now() - new Date(fetchedAt).getTime()) / 60_000),
+  );
+  const base =
+    minutes === 0
+      ? "Uppdaterad just nu"
+      : minutes === 1
+        ? "Uppdaterad för 1 minut sedan"
+        : `Uppdaterad för ${minutes} minuter sedan`;
+  return stale ? `${base} (gammal data — svarade inte)` : base;
 }
