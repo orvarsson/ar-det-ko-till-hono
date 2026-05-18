@@ -24,7 +24,7 @@ export const Route = createFileRoute("/")({
 
 function QueuePage() {
   const data = Route.useLoaderData() as LoadedStatus;
-  const { question, status } = data;
+  const { question, status, direction } = data;
   const answer = status?.status;
   const answerClass =
     answer === "Ja"
@@ -37,19 +37,25 @@ function QueuePage() {
     answer === "Ja" && status
       ? ferryEstimateLine(status.durationSec - status.staticDurationSec)
       : null;
+  const ariaLabel = buildAriaLabel(answer, direction);
 
   return (
     <div className={styles.page}>
       <main className={styles.main}>
         <p className={styles.question}>{question}</p>
-        <h1 className={`${styles.answer} ${answerClass}`}>{display}</h1>
+        <h1
+          className={`${styles.answer} ${answerClass}`}
+          aria-label={ariaLabel}
+        >
+          {display}
+        </h1>
         {ferryLine && <p className={styles.estimate}>{ferryLine}</p>}
         <p className={styles.meta}>
           {buildFreshnessLine(status?.fetchedAt, status?.stale)}
         </p>
       </main>
 
-      <footer className={styles.footer}>
+      <footer className={styles.footer} role="contentinfo">
         Skapad av{" "}
         <a href="https://orvify.se" rel="noopener">
           orvify.se
@@ -57,6 +63,16 @@ function QueuePage() {
       </footer>
     </div>
   );
+}
+
+function buildAriaLabel(
+  answer: "Ja" | "Nej" | undefined,
+  direction: LoadedStatus["direction"],
+): string {
+  const place = direction === "to-hono" ? "Hönö" : "Varholmen";
+  if (answer === "Ja") return `Ja, det är kö till ${place}`;
+  if (answer === "Nej") return `Nej, det är ingen kö till ${place}`;
+  return `Vet ej om det är kö till ${place} just nu`;
 }
 
 function ferryEstimateLine(delaySec: number): string {

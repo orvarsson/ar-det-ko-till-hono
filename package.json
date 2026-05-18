@@ -12,6 +12,8 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@fontsource/inter": "^5.2.8",
+    "@fontsource/playfair-display": "^5.2.8",
     "@tanstack/react-router": "^1.169.2",
     "@tanstack/react-start": "^1.167.65",
     "react": "^19.0.0",

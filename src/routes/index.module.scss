@@ -77,6 +77,13 @@
     text-decoration-thickness: 1px;
     text-decoration-color: color-mix(in oklch, var(--ink-soft) 50%, transparent);
 
+    // Expand the tap target to ≥44px without visually inflating the link.
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;
+    padding-inline: 8px;
+
     &:hover {
       text-decoration-color: var(--ink);
       color: var(--ink);
