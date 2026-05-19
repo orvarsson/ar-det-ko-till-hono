@@ -60,6 +60,7 @@ export const Route = createFileRoute("/")({
 function QueuePage() {
   const data = Route.useLoaderData() as LoadedStatus;
   const { question, status, direction } = data;
+  const social = SOCIAL_META[direction];
   const answer = status?.status;
   const answerClass =
     answer === "Ja"
@@ -72,17 +73,22 @@ function QueuePage() {
     answer === "Ja" && status
       ? ferryEstimateLine(status.durationSec - status.staticDurationSec)
       : null;
-  const ariaLabel = buildAriaLabel(answer, direction);
+  const structuredData = buildStructuredData(direction, social);
 
   return (
     <div className={styles.page}>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: structuredData }}
+      />
+
       <main className={styles.main}>
-        <p className={styles.question}>{question}</p>
-        <h1
-          className={`${styles.answer} ${answerClass}`}
-          aria-label={ariaLabel}
-        >
-          {display}
+        {/* Combining question + answer in one H1 puts the page's keyword
+            into the indexed heading instead of leaving it as a sibling
+            paragraph. Visual hierarchy is preserved via .heading flex. */}
+        <h1 className={styles.heading}>
+          <span className={styles.question}>{question}</span>
+          <span className={`${styles.answer} ${answerClass}`}>{display}</span>
         </h1>
         {ferryLine && <p className={styles.estimate}>{ferryLine}</p>}
         <p className={styles.meta}>
@@ -100,14 +106,43 @@ function QueuePage() {
   );
 }
 
-function buildAriaLabel(
-  answer: "Ja" | "Nej" | undefined,
+function buildStructuredData(
   direction: LoadedStatus["direction"],
+  social: SocialMeta,
 ): string {
   const place = direction === "to-hono" ? "Hönö" : "Varholmen";
-  if (answer === "Ja") return `Ja, det är kö till ${place}`;
-  if (answer === "Nej") return `Nej, det är ingen kö till ${place}`;
-  return `Vet ej om det är kö till ${place} just nu`;
+  const fromPlace = direction === "to-hono" ? "Torslanda" : "Hönö";
+  const graph = [
+    {
+      "@type": "WebSite",
+      "@id": `${social.canonicalUrl}#website`,
+      url: social.canonicalUrl,
+      name: social.question,
+      description: social.description,
+      inLanguage: "sv-SE",
+      publisher: {
+        "@type": "Organization",
+        name: "Orvify",
+        url: "https://orvify.se",
+      },
+    },
+    {
+      "@type": "FAQPage",
+      "@id": `${social.canonicalUrl}#faq`,
+      url: social.canonicalUrl,
+      mainEntity: [
+        {
+          "@type": "Question",
+          name: social.question,
+          acceptedAnswer: {
+            "@type": "Answer",
+            text: `Sidan visar i realtid om det är kö till färjan mot ${place} från ${fromPlace}. Statusen baseras på trafiktid från Google Maps och uppdateras var femte minut.`,
+          },
+        },
+      ],
+    },
+  ];
+  return JSON.stringify({ "@context": "https://schema.org", "@graph": graph });
 }
 
 function ferryEstimateLine(delaySec: number): string {

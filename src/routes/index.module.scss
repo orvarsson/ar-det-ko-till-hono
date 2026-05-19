@@ -19,6 +19,17 @@
   width: 100%;
 }
 
+// .heading wraps the question + answer in a single H1 so the page's keyword
+// lives in the indexed heading. Spans inside are styled individually below.
+.heading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  margin: 0;
+  font-weight: 400;
+}
+
 .question {
   font-family: var(--font-sans);
   font-weight: 500;

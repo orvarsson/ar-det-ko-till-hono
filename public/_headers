@@ -1,0 +1,22 @@
+# Cloudflare Workers Static Assets — header rules.
+#
+# This file applies to static assets (favicon, OG images, etc.). HTML
+# responses come from the Worker (SSR) and get the same security headers
+# applied in src/server/loadStatus.ts.
+
+/*
+  Strict-Transport-Security: max-age=31536000; includeSubDomains
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: DENY
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: geolocation=(), microphone=(), camera=(), interest-cohort=()
+
+# Long-lived caches for stable static assets. Filename changes bust the cache.
+/favicon.svg
+  Cache-Control: public, max-age=604800
+
+/og-hono.png
+  Cache-Control: public, max-age=604800
+
+/og-varholmen.png
+  Cache-Control: public, max-age=604800

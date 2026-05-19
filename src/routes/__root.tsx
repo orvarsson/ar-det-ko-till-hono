@@ -15,7 +15,11 @@ export const Route = createRootRoute({
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { name: "robots", content: "index, follow" },
+      {
+        name: "robots",
+        content:
+          "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1",
+      },
       { name: "theme-color", content: "#e9eef2" },
       { property: "og:type", content: "website" },
       { property: "og:locale", content: "sv_SE" },
