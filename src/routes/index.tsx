@@ -2,21 +2,56 @@ import { createFileRoute } from "@tanstack/react-router";
 import { loadStatus, type LoadedStatus } from "~/server/loadStatus";
 import styles from "./index.module.scss";
 
+type SocialMeta = {
+  question: string;
+  description: string;
+  canonicalUrl: string;
+  ogImage: string;
+};
+
+const SOCIAL_META: Record<LoadedStatus["direction"], SocialMeta> = {
+  "to-hono": {
+    question: "Är det kö till Hönö?",
+    description:
+      "Live-status för Hönöfärjan från Torslanda. Uppdateras var femte minut.",
+    canonicalUrl: "https://ärdetkötillhönö.se/",
+    ogImage: "https://ärdetkötillhönö.se/og-hono.png",
+  },
+  "to-varholmen": {
+    question: "Är det kö till Varholmen?",
+    description:
+      "Live-status för Varholmenfärjan från Hönö. Uppdateras var femte minut.",
+    canonicalUrl: "https://ärdetkötillvarholmen.se/",
+    ogImage: "https://ärdetkötillvarholmen.se/og-varholmen.png",
+  },
+};
+
 export const Route = createFileRoute("/")({
   loader: () => loadStatus(),
   head: ({ loaderData }) => {
-    const question = loaderData?.question ?? "Är det kö till Hönö?";
+    const direction = loaderData?.direction ?? "to-hono";
+    const social = SOCIAL_META[direction];
     const answer = loaderData?.status?.status;
-    const title = answer ? `${answer} — ${question}` : question;
+    // Browser tab title gets the live answer; social titles stay evergreen
+    // because Facebook/Twitter cache previews server-side and a stale "Ja"
+    // would be worse than no answer at all.
+    const tabTitle = answer ? `${answer} — ${social.question}` : social.question;
     return {
       meta: [
-        { title },
-        {
-          name: "description",
-          content: `Live-status för färjekön mellan Hönö och Lilla Varholmen, uppdaterad var femte minut.`,
-        },
-        { property: "og:title", content: title },
+        { title: tabTitle },
+        { name: "description", content: social.description },
+        { property: "og:title", content: social.question },
+        { property: "og:description", content: social.description },
+        { property: "og:url", content: social.canonicalUrl },
+        { property: "og:image", content: social.ogImage },
+        { property: "og:image:width", content: "1200" },
+        { property: "og:image:height", content: "630" },
+        { property: "og:image:alt", content: social.question },
+        { name: "twitter:title", content: social.question },
+        { name: "twitter:description", content: social.description },
+        { name: "twitter:image", content: social.ogImage },
       ],
+      links: [{ rel: "canonical", href: social.canonicalUrl }],
     };
   },
   component: QueuePage,
