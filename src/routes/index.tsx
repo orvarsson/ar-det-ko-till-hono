@@ -74,6 +74,9 @@ function QueuePage() {
       ? ferryEstimateLine(status.durationSec - status.staticDurationSec)
       : null;
   const structuredData = buildStructuredData(direction, social);
+  const otherDirection: LoadedStatus["direction"] =
+    direction === "to-hono" ? "to-varholmen" : "to-hono";
+  const other = SOCIAL_META[otherDirection];
 
   return (
     <div className={styles.page}>
@@ -97,10 +100,15 @@ function QueuePage() {
       </main>
 
       <footer className={styles.footer} role="contentinfo">
-        Skapad av{" "}
-        <a href="https://orvify.se" rel="noopener">
-          orvify.se
+        <a className={styles.crossLink} href={other.canonicalUrl}>
+          {other.question} →
         </a>
+        <span className={styles.credit}>
+          Skapad av{" "}
+          <a href="https://orvify.se" rel="noopener">
+            orvify.se
+          </a>
+        </span>
       </footer>
     </div>
   );
