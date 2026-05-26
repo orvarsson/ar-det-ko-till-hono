@@ -40,9 +40,12 @@ export const DIRECTIONS: Record<Direction, DirectionConfig> = {
   },
 };
 
-// Both human-readable and Punycode forms. Cloudflare passes the canonical zone
-// form in the Host header, which depends on how the domain was added.
+// All four forms per direction: ASCII apex+www (canonical), IDN Unicode+www,
+// IDN Punycode+www. Cloudflare uses whichever form was attached as a custom
+// domain when populating the Host header.
 const HONO_HOSTS = new Set([
+  "ardetkotillhono.se",
+  "www.ardetkotillhono.se",
   "ärdetkötillhönö.se",
   "xn--rdetktillhn-k8a3vfb.se",
   "www.ärdetkötillhönö.se",
@@ -50,6 +53,8 @@ const HONO_HOSTS = new Set([
 ]);
 
 const VARHOLMEN_HOSTS = new Set([
+  "ardetkotillvarholmen.se",
+  "www.ardetkotillvarholmen.se",
   "ärdetkötillvarholmen.se",
   "xn--rdetktillvarholmen-ktb97a.se",
   "www.ärdetkötillvarholmen.se",
@@ -75,7 +80,11 @@ export function directionFromHost(
   if (normalized.includes("varholmen")) {
     return "to-varholmen";
   }
-  if (normalized.includes("hön") || normalized.includes("rdetktillhn")) {
+  if (
+    normalized.includes("hön") ||
+    normalized.includes("rdetktillhn") ||
+    normalized.includes("hono")
+  ) {
     return "to-hono";
   }
   return null;

@@ -1,7 +1,9 @@
 import { createServerFn } from "@tanstack/react-start";
 import { getRequest, setResponseHeader } from "@tanstack/react-start/server";
+import { redirect } from "@tanstack/react-router";
 import { directionFromHost, type Direction, DIRECTIONS } from "./directions";
 import { getQueueStatus, type QueueStatus } from "./queue";
+import { redirectTargetForRequest } from "./canonical";
 
 export type LoadedStatus = {
   direction: Direction;
@@ -22,6 +24,13 @@ const SECURITY_HEADERS: Record<string, string> = {
 
 export const loadStatus = createServerFn({ method: "GET" }).handler(async (): Promise<LoadedStatus> => {
   const request = getRequest();
+
+  // Non-canonical hosts (IDN, www) 301 to ASCII apex before we do any work.
+  const redirectTarget = redirectTargetForRequest(request);
+  if (redirectTarget) {
+    throw redirect({ href: redirectTarget, statusCode: 301 });
+  }
+
   const host = request?.headers.get("host") ?? null;
   // Local dev convenience: default to to-hono when host doesn't resolve.
   const direction = directionFromHost(host) ?? "to-hono";

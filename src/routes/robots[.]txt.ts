@@ -1,6 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { getRequest } from "@tanstack/react-start/server";
-import { canonicalForRequest } from "~/server/canonical";
+import {
+  canonicalForRequest,
+  redirectTargetForRequest,
+} from "~/server/canonical";
 
 function buildRobots(canonical: string): string {
   return `# Content Signals: declare AI usage preferences
@@ -84,7 +87,15 @@ export const Route = createFileRoute("/robots.txt")({
   server: {
     handlers: {
       GET: () => {
-        const canonical = canonicalForRequest(getRequest());
+        const request = getRequest();
+        const redirectTarget = redirectTargetForRequest(request);
+        if (redirectTarget) {
+          return new Response(null, {
+            status: 301,
+            headers: { Location: redirectTarget },
+          });
+        }
+        const canonical = canonicalForRequest(request);
         return new Response(buildRobots(canonical), {
           headers: {
             "Content-Type": "text/plain; charset=utf-8",

@@ -7,10 +7,18 @@ export default defineConfig({
   server: {
     port: 3000,
     allowedHosts: [
+      "ardetkotillhono.se",
+      "www.ardetkotillhono.se",
+      "ardetkotillvarholmen.se",
+      "www.ardetkotillvarholmen.se",
       "ärdetkötillhönö.se",
+      "www.ärdetkötillhönö.se",
       "xn--rdetktillhn-k8a3vfb.se",
+      "www.xn--rdetktillhn-k8a3vfb.se",
       "ärdetkötillvarholmen.se",
+      "www.ärdetkötillvarholmen.se",
       "xn--rdetktillvarholmen-ktb97a.se",
+      "www.xn--rdetktillvarholmen-ktb97a.se",
       "localhost",
     ],
   },

@@ -1,6 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { getRequest } from "@tanstack/react-start/server";
-import { canonicalForRequest } from "~/server/canonical";
+import {
+  canonicalForRequest,
+  redirectTargetForRequest,
+} from "~/server/canonical";
 
 function escapeXml(value: string): string {
   return value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
@@ -24,7 +27,15 @@ export const Route = createFileRoute("/sitemap.xml")({
   server: {
     handlers: {
       GET: () => {
-        const canonical = canonicalForRequest(getRequest());
+        const request = getRequest();
+        const redirectTarget = redirectTargetForRequest(request);
+        if (redirectTarget) {
+          return new Response(null, {
+            status: 301,
+            headers: { Location: redirectTarget },
+          });
+        }
+        const canonical = canonicalForRequest(request);
         return new Response(buildSitemap(canonical), {
           headers: {
             "Content-Type": "application/xml; charset=utf-8",

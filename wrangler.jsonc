@@ -19,9 +19,27 @@
   // GOOGLE_MAPS_API_KEY is stored as a secret, not a var.
   // Set it with: wrangler secret put GOOGLE_MAPS_API_KEY
   // For local dev, drop it in .dev.vars (gitignored).
-  // Use Punycode forms — Cloudflare's API stores IDN zones in Punycode and
-  // rejects the Unicode form when attaching custom domains.
+  // ASCII domains are the canonical homes. IDN domains stay bound to the
+  // worker so they can serve a 301 redirect to the ASCII apex (handled in
+  // src/server/canonical.ts and consumed by the SSR handlers).
+  // Cloudflare's API stores IDN zones in Punycode; use the Punycode form.
   "routes": [
+    {
+      "pattern": "ardetkotillhono.se",
+      "custom_domain": true
+    },
+    {
+      "pattern": "www.ardetkotillhono.se",
+      "custom_domain": true
+    },
+    {
+      "pattern": "ardetkotillvarholmen.se",
+      "custom_domain": true
+    },
+    {
+      "pattern": "www.ardetkotillvarholmen.se",
+      "custom_domain": true
+    },
     {
       "pattern": "xn--rdetktillhn-k8a3vfb.se",
       "custom_domain": true

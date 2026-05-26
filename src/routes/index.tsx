@@ -14,15 +14,15 @@ const SOCIAL_META: Record<LoadedStatus["direction"], SocialMeta> = {
     question: "Är det kö till Hönö?",
     description:
       "Live-status för Hönöfärjan från Torslanda. Uppdateras var femte minut.",
-    canonicalUrl: "https://ärdetkötillhönö.se/",
-    ogImage: "https://ärdetkötillhönö.se/og-hono.png",
+    canonicalUrl: "https://ardetkotillhono.se/",
+    ogImage: "https://ardetkotillhono.se/og-hono.png",
   },
   "to-varholmen": {
     question: "Är det kö till Varholmen?",
     description:
       "Live-status för Varholmenfärjan från Hönö. Uppdateras var femte minut.",
-    canonicalUrl: "https://ärdetkötillvarholmen.se/",
-    ogImage: "https://ärdetkötillvarholmen.se/og-varholmen.png",
+    canonicalUrl: "https://ardetkotillvarholmen.se/",
+    ogImage: "https://ardetkotillvarholmen.se/og-varholmen.png",
   },
 };
 
