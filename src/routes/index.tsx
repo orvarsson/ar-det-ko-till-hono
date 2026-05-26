@@ -4,7 +4,11 @@ import styles from "./index.module.scss";
 
 type SocialMeta = {
   question: string;
+  // Short keyword qualifier appended to the <title> tag. The visible H1 stays
+  // the bare question; the title can carry the brand/route keyword too.
+  titleQualifier: string;
   description: string;
+  keywords: string;
   canonicalUrl: string;
   ogImage: string;
 };
@@ -12,18 +16,58 @@ type SocialMeta = {
 const SOCIAL_META: Record<LoadedStatus["direction"], SocialMeta> = {
   "to-hono": {
     question: "Är det kö till Hönö?",
+    titleQualifier: "Hönöfärjan live",
     description:
-      "Live-status för Hönöfärjan från Torslanda. Uppdateras var femte minut.",
+      "Är det kö till färjan till Hönö just nu? Live-status för Hönöfärjan (Hönöleden) mellan Lilla Varholmen och Hönö Pinan – uppdateras var femte minut.",
+    keywords:
+      "är det kö till Hönö, kö Hönö, färja till Hönö, Hönöfärjan, Hönöleden, Hönö Pinan färja, Lilla Varholmen, färja Torslanda Hönö, kö Hönöfärjan",
     canonicalUrl: "https://ardetkotillhono.se/",
     ogImage: "https://ardetkotillhono.se/og-hono.png",
   },
   "to-varholmen": {
     question: "Är det kö till Varholmen?",
+    titleQualifier: "Hönöfärjan live",
     description:
-      "Live-status för Varholmenfärjan från Hönö. Uppdateras var femte minut.",
+      "Är det kö till färjan från Hönö Pinan mot Lilla Varholmen just nu? Live-status för Hönöfärjan (Hönöleden) – uppdateras var femte minut.",
+    keywords:
+      "är det kö till Varholmen, kö Varholmen, färja från Hönö, Hönö Pinan färja, Lilla Varholmen, Hönöfärjan, Hönöleden, kö Hönö Pinan",
     canonicalUrl: "https://ardetkotillvarholmen.se/",
     ogImage: "https://ardetkotillvarholmen.se/og-varholmen.png",
   },
+};
+
+// Direction-specific Q&A used for FAQPage structured data. Kept truthful so the
+// schema stays accurate: Hönöleden is a free state ferry run by Trafikverkets
+// Färjerederi between Lilla Varholmen and Hönö Pinan.
+const FAQ: Record<LoadedStatus["direction"], { q: string; a: string }[]> = {
+  "to-hono": [
+    {
+      q: "Är det kö till Hönö just nu?",
+      a: "Den här sidan visar i realtid om det är kö till Hönöfärjan vid Lilla Varholmen. Svaret baseras på aktuell trafiktid från Google Maps och uppdateras var femte minut.",
+    },
+    {
+      q: "Är Hönöfärjan gratis?",
+      a: "Ja. Hönöfärjan (Hönöleden) mellan Lilla Varholmen och Hönö Pinan drivs av Trafikverkets Färjerederi och är gratis för både bilister och passagerare.",
+    },
+    {
+      q: "Hur ofta går färjan till Hönö?",
+      a: "Färjan till Hönö går ofta – flera turer i timmen – med tätare avgångar under rusningstrafik morgon och eftermiddag.",
+    },
+  ],
+  "to-varholmen": [
+    {
+      q: "Är det kö till Varholmen just nu?",
+      a: "Den här sidan visar i realtid om det är kö till färjan från Hönö Pinan mot Lilla Varholmen. Svaret baseras på aktuell trafiktid från Google Maps och uppdateras var femte minut.",
+    },
+    {
+      q: "Var ligger Hönö Pinan?",
+      a: "Hönö Pinan är färjeläget på Hönö där Hönöfärjan lägger till. Härifrån går färjan tillbaka mot Lilla Varholmen och fastlandet.",
+    },
+    {
+      q: "Är färjan från Hönö gratis?",
+      a: "Ja. Hönöfärjan (Hönöleden) mellan Hönö Pinan och Lilla Varholmen drivs av Trafikverkets Färjerederi och är gratis.",
+    },
+  ],
 };
 
 export const Route = createFileRoute("/")({
@@ -34,12 +78,16 @@ export const Route = createFileRoute("/")({
     const answer = loaderData?.status?.status;
     // Browser tab title gets the live answer; social titles stay evergreen
     // because Facebook/Twitter cache previews server-side and a stale "Ja"
-    // would be worse than no answer at all.
-    const tabTitle = answer ? `${answer} — ${social.question}` : social.question;
+    // would be worse than no answer at all. The qualifier adds the route
+    // keyword ("Hönöfärjan") to the <title> without touching the visible H1.
+    const tabTitle = answer
+      ? `${answer} — ${social.question} | Hönöfärjan`
+      : `${social.question} | ${social.titleQualifier}`;
     return {
       meta: [
         { title: tabTitle },
         { name: "description", content: social.description },
+        { name: "keywords", content: social.keywords },
         { property: "og:title", content: social.question },
         { property: "og:description", content: social.description },
         { property: "og:url", content: social.canonicalUrl },
@@ -118,8 +166,6 @@ function buildStructuredData(
   direction: LoadedStatus["direction"],
   social: SocialMeta,
 ): string {
-  const place = direction === "to-hono" ? "Hönö" : "Varholmen";
-  const fromPlace = direction === "to-hono" ? "Torslanda" : "Hönö";
   const graph = [
     {
       "@type": "WebSite",
@@ -128,6 +174,13 @@ function buildStructuredData(
       name: social.question,
       description: social.description,
       inLanguage: "sv-SE",
+      keywords: social.keywords,
+      about: [
+        { "@type": "Place", name: "Hönö" },
+        { "@type": "Place", name: "Hönö Pinan" },
+        { "@type": "Place", name: "Lilla Varholmen" },
+        { "@type": "Place", name: "Hönöleden" },
+      ],
       publisher: {
         "@type": "Organization",
         name: "Orvify",
@@ -138,16 +191,11 @@ function buildStructuredData(
       "@type": "FAQPage",
       "@id": `${social.canonicalUrl}#faq`,
       url: social.canonicalUrl,
-      mainEntity: [
-        {
-          "@type": "Question",
-          name: social.question,
-          acceptedAnswer: {
-            "@type": "Answer",
-            text: `Sidan visar i realtid om det är kö till färjan mot ${place} från ${fromPlace}. Statusen baseras på trafiktid från Google Maps och uppdateras var femte minut.`,
-          },
-        },
-      ],
+      mainEntity: FAQ[direction].map(({ q, a }) => ({
+        "@type": "Question",
+        name: q,
+        acceptedAnswer: { "@type": "Answer", text: a },
+      })),
     },
   ];
   return JSON.stringify({ "@context": "https://schema.org", "@graph": graph });
