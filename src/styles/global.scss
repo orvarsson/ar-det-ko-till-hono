@@ -10,8 +10,30 @@
   --ja:        oklch(0.62  0.16  60);   /* warm amber for "Ja" */
   --nej:       oklch(0.55  0.13  160);  /* saturated green for "Nej" */
 
-  --font-sans: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
-  --font-display: "Playfair Display", Georgia, serif;
+  --font-sans: "Inter", "Inter Fallback", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-display: "Playfair Display", "Playfair Display Fallback", Georgia, serif;
+}
+
+/* Metric-adjusted fallbacks: the real fonts (loaded async by @fontsource with
+   font-display: swap) still swap in, but these fallbacks are resized to occupy
+   the same box, so the swap causes no layout shift / visible size jump.
+   Tuned against Arial / Times New Roman, the same way next/font does it. */
+@font-face {
+  font-family: "Inter Fallback";
+  src: local("Arial");
+  ascent-override: 90.44%;
+  descent-override: 22.52%;
+  line-gap-override: 0.00%;
+  size-adjust: 107.12%;
+}
+
+@font-face {
+  font-family: "Playfair Display Fallback";
+  src: local("Times New Roman");
+  ascent-override: 97.25%;
+  descent-override: 22.56%;
+  line-gap-override: 0.00%;
+  size-adjust: 111.26%;
 }
 
 *,
