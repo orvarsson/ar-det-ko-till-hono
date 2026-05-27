@@ -46,6 +46,7 @@ Unknown hosts fall back to `to-hono` so plain `localhost` still works.
 wrangler kv namespace create QUEUE_CACHE                  # paste id into wrangler.jsonc
 wrangler kv namespace create QUEUE_CACHE --preview        # paste preview_id
 wrangler secret put GOOGLE_MAPS_API_KEY                   # paste key
+wrangler secret put TRAFIKVERKET_API_KEY                  # paste key (trafikinfo.trafikverket.se)
 
 # Manual deploy
 npm run deploy
@@ -87,6 +88,7 @@ src/
     directions.ts     # coordinates per direction, host → direction mapping
     google.ts         # Routes API client
     queue.ts          # KV cache + Google fetch (uses cloudflare:workers env)
+    trafikverket.ts   # Trafikinfo FerryRoute client + next-departure computation
     loadStatus.ts     # the server function the page loader calls
   styles/
     global.scss       # tokens, reset, base typography

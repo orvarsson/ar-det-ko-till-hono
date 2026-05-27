@@ -107,7 +107,15 @@ export const Route = createFileRoute("/")({
 
 function QueuePage() {
   const data = Route.useLoaderData() as LoadedStatus;
-  const { question, status, direction } = data;
+  const {
+    question,
+    status,
+    direction,
+    nextDepartures,
+    liveAlerts,
+    fromHarbor,
+    ferriesAhead,
+  } = data;
   const social = SOCIAL_META[direction];
   const answer = status?.status;
   const answerClass =
@@ -118,9 +126,10 @@ function QueuePage() {
         : styles.unknown;
   const display = answer ?? "Vet ej just nu";
   const ferryLine =
-    answer === "Ja" && status
-      ? ferryEstimateLine(status.durationSec - status.staticDurationSec)
+    answer === "Ja" && ferriesAhead != null
+      ? ferryEstimateLine(ferriesAhead)
       : null;
+  const showCatchability = nextDepartures.some((d) => d.catchability);
   const structuredData = buildStructuredData(direction, social);
   const otherDirection: LoadedStatus["direction"] =
     direction === "to-hono" ? "to-varholmen" : "to-hono";
@@ -145,6 +154,84 @@ function QueuePage() {
         <p className={styles.meta}>
           {buildFreshnessLine(status?.fetchedAt, status?.stale)}
         </p>
+        {liveAlerts.length > 0 && (
+          <aside className={styles.alerts} role="status">
+            <span className={styles.alertsLabel}>Driftinformation</span>
+            <ul className={styles.alertsList}>
+              {liveAlerts.map((msg) => (
+                <li key={msg}>{msg}</li>
+              ))}
+            </ul>
+          </aside>
+        )}
+        {nextDepartures.length > 0 && (
+          <section className={styles.departures} aria-label="Nästa avgångar">
+            <h2 className={styles.departuresHeading}>
+              Nästa avgångar från {fromHarbor}
+            </h2>
+            <ul className={styles.departuresList}>
+              {nextDepartures.map((dep) => {
+                const catchClass = dep.catchability
+                  ? styles[`catch_${dep.catchability}`]
+                  : "";
+                const catchLabel = dep.catchability
+                  ? CATCHABILITY_LABEL[dep.catchability]
+                  : null;
+                const ariaLabel = [
+                  dep.time,
+                  dep.tomorrow ? "imorgon" : null,
+                  catchLabel,
+                  dep.alerts?.length ? `driftinformation: ${dep.alerts.join(" ")}` : null,
+                ]
+                  .filter(Boolean)
+                  .join(", ");
+                return (
+                  <li
+                    key={`${dep.tomorrow ? "t" : "d"}-${dep.time}`}
+                    className={`${styles.departuresItem} ${catchClass} ${dep.alerts ? styles.departuresItemAlert : ""}`}
+                    title={dep.alerts?.join(" · ")}
+                    aria-label={ariaLabel}
+                  >
+                    <span className={styles.departuresTime}>{dep.time}</span>
+                    {dep.tomorrow && (
+                      <span className={styles.departuresTag}>imorgon</span>
+                    )}
+                    {dep.alerts && (
+                      <span className={styles.departuresTag} aria-hidden="true">
+                        !
+                      </span>
+                    )}
+                  </li>
+                );
+              })}
+            </ul>
+            {showCatchability && (
+              <ul className={styles.legend} aria-label="Förklaring">
+                <li className={styles.legendItem}>
+                  <span
+                    className={`${styles.legendDot} ${styles.catch_catch}`}
+                    aria-hidden="true"
+                  />
+                  Hinner
+                </li>
+                <li className={styles.legendItem}>
+                  <span
+                    className={`${styles.legendDot} ${styles.catch_maybe}`}
+                    aria-hidden="true"
+                  />
+                  Kanske
+                </li>
+                <li className={styles.legendItem}>
+                  <span
+                    className={`${styles.legendDot} ${styles.catch_miss}`}
+                    aria-hidden="true"
+                  />
+                  Missar
+                </li>
+              </ul>
+            )}
+          </section>
+        )}
       </main>
 
       <footer className={styles.footer} role="contentinfo">
@@ -201,15 +288,22 @@ function buildStructuredData(
   return JSON.stringify({ "@context": "https://schema.org", "@graph": graph });
 }
 
-function ferryEstimateLine(delaySec: number): string {
-  const min = Math.max(0, Math.round(delaySec / 60));
-  if (min <= 2) return "..men, du borde komma med färjan ändå!";
-  if (min <= 4) return "Du kommer antagligen att behöva vänta 1 färja";
-  if (min <= 7) return "Du kommer antagligen att behöva vänta 2 färjor";
-  if (min <= 10) return "Du kommer antagligen att behöva vänta 3 färjor";
-  if (min <= 15) return "Du kommer antagligen att behöva vänta 4 färjor";
+function ferryEstimateLine(ferriesAhead: number): string {
+  if (ferriesAhead === 0) return "..men, du borde komma med färjan ändå!";
+  if (ferriesAhead === 1) return "Du kommer antagligen att behöva vänta 1 färja";
+  if (ferriesAhead <= 4)
+    return `Du kommer antagligen att behöva vänta ${ferriesAhead} färjor`;
   return "Du kommer antagligen att behöva vänta ett bra tag";
 }
+
+const CATCHABILITY_LABEL: Record<
+  NonNullable<LoadedStatus["nextDepartures"][number]["catchability"]>,
+  string
+> = {
+  catch: "Hinner",
+  maybe: "Hinner kanske",
+  miss: "Missar",
+};
 
 function buildFreshnessLine(
   fetchedAt: string | undefined,
