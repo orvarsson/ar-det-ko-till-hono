@@ -39,7 +39,7 @@
 }
 
 .answer {
-  font-family: var(--font-display);
+  font-family: var(--font-sans);
   font-weight: 900;
   font-size: clamp(8rem, 25vw, 16rem);
   // Display weight + tight line-height means "j" in "Nej" overflows the line
