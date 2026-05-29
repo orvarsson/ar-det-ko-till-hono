@@ -244,14 +244,20 @@ function QueuePage() {
 
       <section className={styles.faq} aria-label="Vanliga frågor">
         <h2 className={styles.faqHeading}>Vanliga frågor</h2>
-        <dl className={styles.faqList}>
+        <div className={styles.faqList}>
           {FAQ[direction].map(({ q, a }) => (
-            <div key={q} className={styles.faqItem}>
-              <dt className={styles.faqQuestion}>{q}</dt>
-              <dd className={styles.faqAnswer}>{a}</dd>
-            </div>
+            // Native <details> gives an accessible accordion with no JS — it
+            // works during SSR and before hydration. The default marker is
+            // hidden in CSS in favour of a chevron that rotates when open.
+            <details key={q} className={styles.faqItem}>
+              <summary className={styles.faqQuestion}>
+                {q}
+                <span className={styles.faqChevron} aria-hidden="true" />
+              </summary>
+              <p className={styles.faqAnswer}>{a}</p>
+            </details>
           ))}
-        </dl>
+        </div>
       </section>
 
       <footer className={styles.footer} role="contentinfo">
