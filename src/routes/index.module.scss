@@ -258,27 +258,97 @@
   margin: 0;
   display: flex;
   flex-direction: column;
-  gap: 16px;
 }
 
+// Each accordion row. A top border on every item draws clean dividers between
+// questions; the list as a whole gets a closing border at the bottom.
 .faqItem {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
+  border-top: 1px solid color-mix(in oklch, var(--ink) 12%, transparent);
+
+  &:last-child {
+    border-bottom: 1px solid color-mix(in oklch, var(--ink) 12%, transparent);
+  }
 }
 
 .faqQuestion {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  // ≥44px tap target; padding doubles as the row's vertical rhythm.
+  padding: 14px 4px;
+  min-height: 44px;
+  cursor: pointer;
+
   font-family: var(--font-sans);
   font-weight: 600;
   font-size: 0.95rem;
   color: var(--ink);
+  list-style: none;
+
+  // Drop the native disclosure triangle (Safari uses ::-webkit-details-marker).
+  &::-webkit-details-marker {
+    display: none;
+  }
+
+  &:hover {
+    color: color-mix(in oklch, var(--ink) 80%, var(--ja));
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--ink);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+}
+
+// Chevron drawn from two borders; points down when closed, flips up when open.
+.faqChevron {
+  flex-shrink: 0;
+  width: 8px;
+  height: 8px;
+  border-right: 2px solid var(--ink-soft);
+  border-bottom: 2px solid var(--ink-soft);
+  transform: rotate(45deg);
+  transform-origin: center;
+  transition: transform 200ms ease;
+}
+
+.faqItem[open] .faqChevron {
+  transform: rotate(-135deg);
 }
 
 .faqAnswer {
   margin: 0;
+  padding: 0 4px 16px;
   font-size: 0.95rem;
   line-height: 1.5;
   color: var(--ink-soft);
+}
+
+// Gentle reveal when a row opens. Skipped when the chevron has no room to spin.
+.faqItem[open] .faqAnswer {
+  animation: faq-reveal 200ms ease;
+}
+
+@keyframes faq-reveal {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .faqChevron {
+    transition: none;
+  }
+  .faqItem[open] .faqAnswer {
+    animation: none;
+  }
 }
 
 .footer {
