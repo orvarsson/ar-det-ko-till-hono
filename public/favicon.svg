@@ -1,5 +1,21 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
   <rect width="64" height="64" rx="12" fill="#1d3557"/>
-  <text x="50%" y="58%" text-anchor="middle" dominant-baseline="middle"
-    font-family="Georgia, serif" font-weight="700" font-size="38" fill="#f1faee">?</text>
+  <g transform="translate(0 -6)">
+    <!-- cabin + hull -->
+    <g fill="#f1faee">
+      <rect x="21" y="25" width="22" height="12" rx="2"/>
+      <path d="M13 37 H51 L46 47 Q45.2 48.2 43.8 48.2 H20.2 Q18.8 48.2 18 47 Z"/>
+    </g>
+    <!-- windows -->
+    <g fill="#1d3557">
+      <rect x="24.5" y="28.5" width="4.5" height="5" rx="1"/>
+      <rect x="29.75" y="28.5" width="4.5" height="5" rx="1"/>
+      <rect x="35" y="28.5" width="4.5" height="5" rx="1"/>
+    </g>
+    <!-- water -->
+    <g fill="#f1faee" opacity="0.5">
+      <rect x="15" y="51.5" width="14" height="2.4" rx="1.2"/>
+      <rect x="33" y="51.5" width="16" height="2.4" rx="1.2"/>
+    </g>
+  </g>
 </svg>
