@@ -4,61 +4,71 @@ import styles from "./index.module.scss";
 
 type SocialMeta = {
   question: string;
+  // Short keyword qualifier appended to the <title> tag. The visible H1 stays
+  // the bare question; the title can carry the brand/route keyword too.
+  titleQualifier: string;
   description: string;
+  keywords: string;
   canonicalUrl: string;
   ogImage: string;
-};
-
-// Direction-specific FAQ. Rendered visibly at the bottom of the page and fed
-// into the FAQPage structured data so the schema matches what users actually
-// see. Kept truthful: Hönöleden is a free state ferry run by Trafikverkets
-// Färjerederi between Lilla Varholmen (Torslanda) and Hönö.
-const FAQ: Record<LoadedStatus["direction"], { q: string; a: string }[]> = {
-  "to-hono": [
-    {
-      q: "Är det kö till Hönö just nu?",
-      a: "Sidan visar i realtid om det är kö till färjan mot Hönö från Torslanda. Statusen baseras på trafiktid från Google Maps och uppdateras var femte minut.",
-    },
-    {
-      q: "Är Hönöfärjan gratis?",
-      a: "Ja. Hönöleden mellan Lilla Varholmen och Hönö drivs av Trafikverkets Färjerederi och är gratis för både bilister och passagerare.",
-    },
-    {
-      q: "Hur ofta går färjan till Hönö?",
-      a: "Färjan går ofta – flera turer i timmen – med tätare avgångar under rusningstrafik morgon och eftermiddag.",
-    },
-  ],
-  "to-varholmen": [
-    {
-      q: "Är det kö till Varholmen just nu?",
-      a: "Sidan visar i realtid om det är kö till färjan mot Varholmen från Hönö. Statusen baseras på trafiktid från Google Maps och uppdateras var femte minut.",
-    },
-    {
-      q: "Är färjan från Hönö gratis?",
-      a: "Ja. Hönöleden mellan Hönö och Lilla Varholmen drivs av Trafikverkets Färjerederi och är gratis för både bilister och passagerare.",
-    },
-    {
-      q: "Hur ofta går färjan från Hönö?",
-      a: "Färjan går ofta – flera turer i timmen – med tätare avgångar under rusningstrafik morgon och eftermiddag.",
-    },
-  ],
 };
 
 const SOCIAL_META: Record<LoadedStatus["direction"], SocialMeta> = {
   "to-hono": {
     question: "Är det kö till Hönö?",
+    titleQualifier: "Hönöfärjan live",
     description:
-      "Live-status för Hönöfärjan från Torslanda. Uppdateras var femte minut.",
+      "Är det kö till färjan till Hönö just nu? Live-status för Hönöfärjan (Hönöleden) mellan Lilla Varholmen och Hönö Pinan – uppdateras var femte minut.",
+    keywords:
+      "är det kö till Hönö, kö Hönö, färja till Hönö, Hönöfärjan, Hönöleden, Hönö Pinan färja, Lilla Varholmen, färja Torslanda Hönö, kö Hönöfärjan",
     canonicalUrl: "https://ardetkotillhono.se/",
     ogImage: "https://ardetkotillhono.se/og-hono.png",
   },
   "to-varholmen": {
     question: "Är det kö till Varholmen?",
+    titleQualifier: "Hönöfärjan live",
     description:
-      "Live-status för Varholmenfärjan från Hönö. Uppdateras var femte minut.",
+      "Är det kö till färjan från Hönö Pinan mot Lilla Varholmen just nu? Live-status för Hönöfärjan (Hönöleden) – uppdateras var femte minut.",
+    keywords:
+      "är det kö till Varholmen, kö Varholmen, färja från Hönö, Hönö Pinan färja, Lilla Varholmen, Hönöfärjan, Hönöleden, kö Hönö Pinan",
     canonicalUrl: "https://ardetkotillvarholmen.se/",
     ogImage: "https://ardetkotillvarholmen.se/og-varholmen.png",
   },
+};
+
+// Direction-specific Q&A, rendered as the visible FAQ at the bottom of the
+// page and fed into the FAQPage structured data so the schema matches what
+// users actually see. Kept truthful: Hönöleden is a free state ferry run by
+// Trafikverkets Färjerederi between Lilla Varholmen and Hönö Pinan.
+const FAQ: Record<LoadedStatus["direction"], { q: string; a: string }[]> = {
+  "to-hono": [
+    {
+      q: "Är det kö till Hönö just nu?",
+      a: "Den här sidan visar i realtid om det är kö till Hönöfärjan vid Lilla Varholmen. Svaret baseras på aktuell trafiktid från Google Maps och uppdateras var femte minut.",
+    },
+    {
+      q: "Är Hönöfärjan gratis?",
+      a: "Ja. Hönöfärjan (Hönöleden) mellan Lilla Varholmen och Hönö Pinan drivs av Trafikverkets Färjerederi och är gratis för både bilister och passagerare.",
+    },
+    {
+      q: "Hur ofta går färjan till Hönö?",
+      a: "Färjan till Hönö går ofta – flera turer i timmen – med tätare avgångar under rusningstrafik morgon och eftermiddag.",
+    },
+  ],
+  "to-varholmen": [
+    {
+      q: "Är det kö till Varholmen just nu?",
+      a: "Den här sidan visar i realtid om det är kö till färjan från Hönö Pinan mot Lilla Varholmen. Svaret baseras på aktuell trafiktid från Google Maps och uppdateras var femte minut.",
+    },
+    {
+      q: "Var ligger Hönö Pinan?",
+      a: "Hönö Pinan är färjeläget på Hönö där Hönöfärjan lägger till. Härifrån går färjan tillbaka mot Lilla Varholmen och fastlandet.",
+    },
+    {
+      q: "Är färjan från Hönö gratis?",
+      a: "Ja. Hönöfärjan (Hönöleden) mellan Hönö Pinan och Lilla Varholmen drivs av Trafikverkets Färjerederi och är gratis.",
+    },
+  ],
 };
 
 export const Route = createFileRoute("/")({
@@ -69,12 +79,16 @@ export const Route = createFileRoute("/")({
     const answer = loaderData?.status?.status;
     // Browser tab title gets the live answer; social titles stay evergreen
     // because Facebook/Twitter cache previews server-side and a stale "Ja"
-    // would be worse than no answer at all.
-    const tabTitle = answer ? `${answer} — ${social.question}` : social.question;
+    // would be worse than no answer at all. The qualifier adds the route
+    // keyword ("Hönöfärjan") to the <title> without touching the visible H1.
+    const tabTitle = answer
+      ? `${answer} — ${social.question} | Hönöfärjan`
+      : `${social.question} | ${social.titleQualifier}`;
     return {
       meta: [
         { title: tabTitle },
         { name: "description", content: social.description },
+        { name: "keywords", content: social.keywords },
         { property: "og:title", content: social.question },
         { property: "og:description", content: social.description },
         { property: "og:url", content: social.canonicalUrl },
@@ -94,7 +108,15 @@ export const Route = createFileRoute("/")({
 
 function QueuePage() {
   const data = Route.useLoaderData() as LoadedStatus;
-  const { question, status, direction } = data;
+  const {
+    question,
+    status,
+    direction,
+    nextDepartures,
+    liveAlerts,
+    fromHarbor,
+    ferriesAhead,
+  } = data;
   const social = SOCIAL_META[direction];
   const answer = status?.status;
   const answerClass =
@@ -105,9 +127,10 @@ function QueuePage() {
         : styles.unknown;
   const display = answer ?? "Vet ej just nu";
   const ferryLine =
-    answer === "Ja" && status
-      ? ferryEstimateLine(status.durationSec - status.staticDurationSec)
+    answer === "Ja" && ferriesAhead != null
+      ? ferryEstimateLine(ferriesAhead)
       : null;
+  const showCatchability = nextDepartures.some((d) => d.catchability);
   const structuredData = buildStructuredData(direction, social);
   const otherDirection: LoadedStatus["direction"] =
     direction === "to-hono" ? "to-varholmen" : "to-hono";
@@ -132,6 +155,91 @@ function QueuePage() {
         <p className={styles.meta}>
           {buildFreshnessLine(status?.fetchedAt, status?.stale)}
         </p>
+        {liveAlerts.length > 0 && (
+          <aside className={styles.alerts} role="status">
+            <span className={styles.alertsLabel}>Driftinformation</span>
+            <ul className={styles.alertsList}>
+              {liveAlerts.map((msg) => (
+                <li key={msg}>{msg}</li>
+              ))}
+            </ul>
+          </aside>
+        )}
+        {nextDepartures.length > 0 && (
+          <section className={styles.departures} aria-label="Nästa avgångar">
+            <h2 className={styles.departuresHeading}>
+              Nästa avgångar från {fromHarbor}
+            </h2>
+            <ul className={styles.departuresList}>
+              {nextDepartures.map((dep) => {
+                const catchClass = dep.catchability
+                  ? styles[`catch_${dep.catchability}`]
+                  : "";
+                const catchLabel = dep.catchability
+                  ? CATCHABILITY_LABEL[dep.catchability]
+                  : null;
+                const ariaLabel = [
+                  dep.time,
+                  dep.tomorrow ? "imorgon" : null,
+                  catchLabel,
+                  dep.alerts?.length ? `driftinformation: ${dep.alerts.join(" ")}` : null,
+                ]
+                  .filter(Boolean)
+                  .join(", ");
+                return (
+                  <li
+                    key={`${dep.tomorrow ? "t" : "d"}-${dep.time}`}
+                    className={`${styles.departuresItem} ${catchClass} ${dep.alerts ? styles.departuresItemAlert : ""}`}
+                    title={dep.alerts?.join(" · ")}
+                    aria-label={ariaLabel}
+                  >
+                    <span className={styles.departuresTime}>{dep.time}</span>
+                    {dep.tomorrow && (
+                      <span className={styles.departuresTag}>imorgon</span>
+                    )}
+                    {dep.alerts && (
+                      <span className={styles.departuresTag} aria-hidden="true">
+                        !
+                      </span>
+                    )}
+                  </li>
+                );
+              })}
+            </ul>
+            {showCatchability && (
+              <ul className={styles.legend} aria-label="Förklaring">
+                <li className={styles.legendItem}>
+                  <span
+                    className={`${styles.legendDot} ${styles.catch_catch}`}
+                    aria-hidden="true"
+                  />
+                  Hinner
+                </li>
+                <li className={styles.legendItem}>
+                  <span
+                    className={`${styles.legendDot} ${styles.catch_maybe}`}
+                    aria-hidden="true"
+                  />
+                  Kanske
+                </li>
+                <li className={styles.legendItem}>
+                  <span
+                    className={`${styles.legendDot} ${styles.catch_miss}`}
+                    aria-hidden="true"
+                  />
+                  Missar
+                </li>
+              </ul>
+            )}
+          </section>
+        )}
+        <a
+          className={styles.timetableLink}
+          href="https://honoleden.se"
+          rel="noopener"
+        >
+          Se hela tidtabellen på Hönöleden.se →
+        </a>
       </main>
 
       <section className={styles.faq} aria-label="Vanliga frågor">
@@ -173,6 +281,13 @@ function buildStructuredData(
       name: social.question,
       description: social.description,
       inLanguage: "sv-SE",
+      keywords: social.keywords,
+      about: [
+        { "@type": "Place", name: "Hönö" },
+        { "@type": "Place", name: "Hönö Pinan" },
+        { "@type": "Place", name: "Lilla Varholmen" },
+        { "@type": "Place", name: "Hönöleden" },
+      ],
       publisher: {
         "@type": "Organization",
         name: "Orvify",
@@ -193,15 +308,22 @@ function buildStructuredData(
   return JSON.stringify({ "@context": "https://schema.org", "@graph": graph });
 }
 
-function ferryEstimateLine(delaySec: number): string {
-  const min = Math.max(0, Math.round(delaySec / 60));
-  if (min <= 2) return "..men, du borde komma med färjan ändå!";
-  if (min <= 4) return "Du kommer antagligen att behöva vänta 1 färja";
-  if (min <= 7) return "Du kommer antagligen att behöva vänta 2 färjor";
-  if (min <= 10) return "Du kommer antagligen att behöva vänta 3 färjor";
-  if (min <= 15) return "Du kommer antagligen att behöva vänta 4 färjor";
+function ferryEstimateLine(ferriesAhead: number): string {
+  if (ferriesAhead === 0) return "..men, du borde komma med färjan ändå!";
+  if (ferriesAhead === 1) return "Du kommer antagligen att behöva vänta 1 färja";
+  if (ferriesAhead <= 4)
+    return `Du kommer antagligen att behöva vänta ${ferriesAhead} färjor`;
   return "Du kommer antagligen att behöva vänta ett bra tag";
 }
+
+const CATCHABILITY_LABEL: Record<
+  NonNullable<LoadedStatus["nextDepartures"][number]["catchability"]>,
+  string
+> = {
+  catch: "Hinner",
+  maybe: "Hinner kanske",
+  miss: "Missar",
+};
 
 function buildFreshnessLine(
   fetchedAt: string | undefined,

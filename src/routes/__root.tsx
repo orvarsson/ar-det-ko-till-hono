@@ -5,10 +5,8 @@ import {
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
-import "@fontsource/inter/400.css";
-import "@fontsource/inter/500.css";
-import "@fontsource/playfair-display/900.css";
 import "../styles/global.scss";
+import { InstallPrompt } from "~/components/InstallPrompt";
 
 export const Route = createRootRoute({
   head: () => ({
@@ -25,8 +23,18 @@ export const Route = createRootRoute({
       { property: "og:locale", content: "sv_SE" },
       { property: "og:site_name", content: "Är det kö?" },
       { name: "twitter:card", content: "summary_large_image" },
+      // Home-screen / installable web app. iOS ignores the manifest's
+      // standalone display + name, so it needs its own apple-* meta tags.
+      { name: "mobile-web-app-capable", content: "yes" },
+      { name: "apple-mobile-web-app-capable", content: "yes" },
+      { name: "apple-mobile-web-app-status-bar-style", content: "default" },
+      { name: "apple-mobile-web-app-title", content: "Är det kö?" },
     ],
-    links: [{ rel: "icon", href: "/favicon.svg", type: "image/svg+xml" }],
+    links: [
+      { rel: "icon", href: "/favicon.svg", type: "image/svg+xml" },
+      { rel: "manifest", href: "/manifest.webmanifest" },
+      { rel: "apple-touch-icon", href: "/apple-touch-icon.png" },
+    ],
   }),
   component: RootComponent,
 });
@@ -35,6 +43,7 @@ function RootComponent() {
   return (
     <RootDocument>
       <Outlet />
+      <InstallPrompt />
     </RootDocument>
   );
 }
