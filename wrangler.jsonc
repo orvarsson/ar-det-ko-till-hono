@@ -7,12 +7,6 @@
   "observability": {
     "enabled": true
   },
-  // Enable versioned Preview URLs (<version>-<name>.<subdomain>.workers.dev)
-  // used by the PR preview workflow. This defaults to `workers_dev`, which is
-  // false for a custom-domain Worker — so it must be set explicitly, or every
-  // `versions upload` would re-disable preview URLs. This does NOT add a
-  // workers.dev route to production; that stays on the custom domains below.
-  "preview_urls": true,
   // KV namespace caches the queue status per direction.
   // Create one with: wrangler kv namespace create QUEUE_CACHE
   "kv_namespaces": [
