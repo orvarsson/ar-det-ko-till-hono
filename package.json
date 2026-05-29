@@ -8,6 +8,7 @@
     "build": "vite build",
     "preview": "vite preview",
     "deploy": "vite build && wrangler deploy",
+    "deploy:preview": "CLOUDFLARE_ENV=preview vite build && wrangler versions upload --env preview",
     "cf-typegen": "wrangler types",
     "typecheck": "tsc --noEmit"
   },

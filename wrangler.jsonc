@@ -4,6 +4,13 @@
   "compatibility_date": "2025-09-24",
   "compatibility_flags": ["nodejs_compat"],
   "main": "@tanstack/react-start/server-entry",
+  // Each `wrangler versions upload` stages a new version under a unique
+  // `<short-id>-<name>.<account>.workers.dev` URL — public but unguessable.
+  // PR previews (.github/workflows/preview.yml → env.preview) rely on this;
+  // production inherits it so a freshly uploaded version can be smoke-tested
+  // at its own URL before traffic flips, and a one-click rollback is always
+  // a known-good version URL away.
+  "preview_urls": true,
   "observability": {
     "enabled": true
   },
@@ -56,5 +63,27 @@
       "pattern": "www.xn--rdetktillvarholmen-ktb97a.se",
       "custom_domain": true
     }
-  ]
+  ],
+  // Per-PR preview env. `wrangler versions upload --env preview` (via
+  // .github/workflows/preview.yml on every PR open/push) stages a new
+  // version of this Worker under a unique workers.dev URL. No custom_domain
+  // routes here — preview traffic stays off the production zones. KV
+  // bindings don't inherit across envs, so the preview namespace id is
+  // repeated explicitly (it was the top-level `preview_id`).
+  "env": {
+    "preview": {
+      "name": "ar-det-ko-till-hono-preview",
+      // Explicitly empty so the production custom_domain routes can't leak
+      // into a preview deploy. `wrangler versions upload --env preview`
+      // stages a version but doesn't take routes until promoted, but empty
+      // here is the safer default.
+      "routes": [],
+      "kv_namespaces": [
+        {
+          "binding": "QUEUE_CACHE",
+          "id": "2af300bd77ce47a98da79c8d82d392fa"
+        }
+      ]
+    }
+  }
 }
