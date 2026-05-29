@@ -232,6 +232,13 @@ function QueuePage() {
             )}
           </section>
         )}
+        <a
+          className={styles.timetableLink}
+          href="https://honoleden.se"
+          rel="noopener"
+        >
+          Se hela tidtabellen på Hönöleden.se →
+        </a>
       </main>
 
       <footer className={styles.footer} role="contentinfo">

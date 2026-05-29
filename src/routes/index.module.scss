@@ -264,6 +264,32 @@
   }
 }
 
+// Outbound CTA to the official timetable, sitting right under the live
+// departure times — people checking the next ferries often want the full
+// schedule next. Sits inside .main, so it carries its own link styling
+// rather than inheriting the footer's.
+.timetableLink {
+  font-family: var(--font-sans);
+  font-size: clamp(1rem, 2vw, 1.125rem);
+  font-weight: 500;
+  color: var(--ink);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-thickness: 1px;
+  text-decoration-color: color-mix(in oklch, var(--ink-soft) 50%, transparent);
+
+  // Expand the tap target to ≥44px without visually inflating the link.
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding-inline: 8px;
+
+  &:hover {
+    text-decoration-color: var(--ink);
+  }
+}
+
 // Cross-link to the sister site. A touch larger and darker than the credit
 // so it reads as "here's another useful place to look".
 .crossLink {
