@@ -8,7 +8,8 @@
   z-index: 50;
 
   display: flex;
-  align-items: center;
+  // Top-aligned so the icon and button stay put when the iOS steps expand.
+  align-items: flex-start;
   gap: 12px;
   max-width: 440px;
   margin-inline: auto;
@@ -68,6 +69,36 @@
   line-height: 1.35;
   color: var(--ink-soft);
   margin: 2px 0 0;
+}
+
+// iOS Share-sheet steps, revealed when the button is tapped.
+.steps {
+  margin: 10px 0 0;
+  padding-left: 1.1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 0.8rem;
+  line-height: 1.35;
+  color: var(--ink-soft);
+  animation: steps-reveal 200ms ease;
+}
+
+@keyframes steps-reveal {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .steps {
+    animation: none;
+  }
 }
 
 .shareGlyph {

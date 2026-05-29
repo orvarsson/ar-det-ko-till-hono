@@ -38,12 +38,14 @@ function rememberDismissed() {
 }
 
 // A bottom popup, styled like a native install banner, nudging mobile users to
-// add the site to their home screen. iOS gets manual instructions (no
-// programmatic install); Android/Chrome gets a one-tap install button wired to
-// the deferred beforeinstallprompt event. Renders nothing on desktop, when
-// already installed, or shortly after a dismissal.
+// add the site to their home screen. Both platforms lead with a button:
+// Android/Chrome installs in one tap via the deferred beforeinstallprompt
+// event; iOS has no programmatic install, so its button reveals the short
+// Share-sheet steps on demand (kept hidden until tapped). Renders nothing on
+// desktop, when already installed, or shortly after a dismissal.
 export function InstallPrompt() {
   const [mode, setMode] = useState<"ios" | "android" | null>(null);
+  const [showSteps, setShowSteps] = useState(false);
   const deferred = useRef<BeforeInstallPromptEvent | null>(null);
 
   useEffect(() => {
@@ -104,20 +106,31 @@ export function InstallPrompt() {
       </span>
       <div className={styles.body}>
         <p className={styles.title}>Lägg till på hemskärmen</p>
-        {mode === "ios" ? (
-          <p className={styles.text}>
-            Tryck på <ShareIcon /> Dela och välj{" "}
-            <strong>”Lägg till på hemskärmen”</strong> för snabb åtkomst.
-          </p>
-        ) : (
-          <p className={styles.text}>
-            Installera appen för snabb åtkomst – direkt från hemskärmen.
-          </p>
+        <p className={styles.text}>Snabb åtkomst – direkt från hemskärmen.</p>
+        {mode === "ios" && showSteps && (
+          // iOS has no install API, so the button reveals the manual steps.
+          <ol className={styles.steps}>
+            <li>
+              Tryck på <ShareIcon /> <strong>Dela</strong> i verktygsfältet.
+            </li>
+            <li>
+              Välj <strong>”Lägg till på hemskärmen”</strong>.
+            </li>
+          </ol>
         )}
       </div>
-      {mode === "android" && (
+      {mode === "android" ? (
         <button type="button" className={styles.install} onClick={install}>
           Lägg till
+        </button>
+      ) : (
+        <button
+          type="button"
+          className={styles.install}
+          onClick={() => setShowSteps((open) => !open)}
+          aria-expanded={showSteps}
+        >
+          {showSteps ? "Dölj" : "Lägg till"}
         </button>
       )}
       <button
