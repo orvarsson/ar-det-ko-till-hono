@@ -41,28 +41,46 @@ jobs:
       # preview URL (on *.workers.dev) WITHOUT touching the production
       # deployment or the custom-domain routes. Requires preview URLs to be
       # enabled for the Worker in the Cloudflare dashboard.
+      #
+      # Output is captured so the comment step can surface the exact wrangler
+      # error if the upload fails (Actions logs aren't always easy to reach).
       - name: Upload preview version
         id: preview
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
         run: |
-          set -o pipefail
-          out=$(npx wrangler versions upload 2>&1 | tee /dev/stderr)
-          url=$(printf '%s\n' "$out" \
-            | grep -oE 'https://[A-Za-z0-9.-]+\.workers\.dev[^ ]*' \
-            | head -n1)
-          echo "url=$url" >> "$GITHUB_OUTPUT"
+          set +e
+          npx wrangler versions upload 2>&1 | tee upload.log
+          rc=${PIPESTATUS[0]}
+          url=$(grep -oE 'https://[A-Za-z0-9.-]+\.workers\.dev[^ ]*' upload.log | head -n1)
+          {
+            echo "rc=$rc"
+            echo "url=$url"
+            echo "log<<WRANGLER_EOF"
+            tail -n 30 upload.log
+            echo "WRANGLER_EOF"
+          } >> "$GITHUB_OUTPUT"
+          exit "$rc"
 
-      - name: Comment preview URL on the PR
+      - name: Comment preview status on the PR
+        if: always() && steps.preview.outcome != 'skipped'
         uses: actions/github-script@v7
         with:
           script: |
+            const rc = ${{ toJSON(steps.preview.outputs.rc) }};
             const url = ${{ toJSON(steps.preview.outputs.url) }};
+            const log = ${{ toJSON(steps.preview.outputs.log) }};
             const marker = '<!-- pr-preview-url -->';
-            const body = url
-              ? `${marker}\n🚀 **Preview deployed**\n\nThis PR is live at ${url}\n\n_Updated automatically on every push. Production is unaffected._`
-              : `${marker}\n⚠️ A preview version was uploaded but no preview URL was returned. Make sure **Preview URLs** are enabled for the Worker in the Cloudflare dashboard.`;
+
+            let body;
+            if (url) {
+              body = `${marker}\n🚀 **Preview deployed**\n\nThis PR is live at ${url}\n\n_Updated automatically on every push. Production is unaffected._`;
+            } else if (rc === '0') {
+              body = `${marker}\n✅ A preview version was uploaded, but no preview URL was returned. Enable **Preview URLs** for the Worker in the Cloudflare dashboard to get a shareable link.`;
+            } else {
+              body = `${marker}\n⚠️ **Preview deploy failed** (\`wrangler versions upload\` exited ${rc}). Last lines:\n\n\`\`\`\n${log || "(no output captured)"}\n\`\`\``;
+            }
 
             const { owner, repo } = context.repo;
             const issue_number = context.issue.number;
