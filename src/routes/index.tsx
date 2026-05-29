@@ -9,6 +9,41 @@ type SocialMeta = {
   ogImage: string;
 };
 
+// Direction-specific FAQ. Rendered visibly at the bottom of the page and fed
+// into the FAQPage structured data so the schema matches what users actually
+// see. Kept truthful: Hönöleden is a free state ferry run by Trafikverkets
+// Färjerederi between Lilla Varholmen (Torslanda) and Hönö.
+const FAQ: Record<LoadedStatus["direction"], { q: string; a: string }[]> = {
+  "to-hono": [
+    {
+      q: "Är det kö till Hönö just nu?",
+      a: "Sidan visar i realtid om det är kö till färjan mot Hönö från Torslanda. Statusen baseras på trafiktid från Google Maps och uppdateras var femte minut.",
+    },
+    {
+      q: "Är Hönöfärjan gratis?",
+      a: "Ja. Hönöleden mellan Lilla Varholmen och Hönö drivs av Trafikverkets Färjerederi och är gratis för både bilister och passagerare.",
+    },
+    {
+      q: "Hur ofta går färjan till Hönö?",
+      a: "Färjan går ofta – flera turer i timmen – med tätare avgångar under rusningstrafik morgon och eftermiddag.",
+    },
+  ],
+  "to-varholmen": [
+    {
+      q: "Är det kö till Varholmen just nu?",
+      a: "Sidan visar i realtid om det är kö till färjan mot Varholmen från Hönö. Statusen baseras på trafiktid från Google Maps och uppdateras var femte minut.",
+    },
+    {
+      q: "Är färjan från Hönö gratis?",
+      a: "Ja. Hönöleden mellan Hönö och Lilla Varholmen drivs av Trafikverkets Färjerederi och är gratis för både bilister och passagerare.",
+    },
+    {
+      q: "Hur ofta går färjan från Hönö?",
+      a: "Färjan går ofta – flera turer i timmen – med tätare avgångar under rusningstrafik morgon och eftermiddag.",
+    },
+  ],
+};
+
 const SOCIAL_META: Record<LoadedStatus["direction"], SocialMeta> = {
   "to-hono": {
     question: "Är det kö till Hönö?",
@@ -99,6 +134,18 @@ function QueuePage() {
         </p>
       </main>
 
+      <section className={styles.faq} aria-label="Vanliga frågor">
+        <h2 className={styles.faqHeading}>Vanliga frågor</h2>
+        <dl className={styles.faqList}>
+          {FAQ[direction].map(({ q, a }) => (
+            <div key={q} className={styles.faqItem}>
+              <dt className={styles.faqQuestion}>{q}</dt>
+              <dd className={styles.faqAnswer}>{a}</dd>
+            </div>
+          ))}
+        </dl>
+      </section>
+
       <footer className={styles.footer} role="contentinfo">
         <a className={styles.crossLink} href={other.canonicalUrl}>
           {other.question} →
@@ -118,8 +165,6 @@ function buildStructuredData(
   direction: LoadedStatus["direction"],
   social: SocialMeta,
 ): string {
-  const place = direction === "to-hono" ? "Hönö" : "Varholmen";
-  const fromPlace = direction === "to-hono" ? "Torslanda" : "Hönö";
   const graph = [
     {
       "@type": "WebSite",
@@ -138,16 +183,11 @@ function buildStructuredData(
       "@type": "FAQPage",
       "@id": `${social.canonicalUrl}#faq`,
       url: social.canonicalUrl,
-      mainEntity: [
-        {
-          "@type": "Question",
-          name: social.question,
-          acceptedAnswer: {
-            "@type": "Answer",
-            text: `Sidan visar i realtid om det är kö till färjan mot ${place} från ${fromPlace}. Statusen baseras på trafiktid från Google Maps och uppdateras var femte minut.`,
-          },
-        },
-      ],
+      mainEntity: FAQ[direction].map(({ q, a }) => ({
+        "@type": "Question",
+        name: q,
+        acceptedAnswer: { "@type": "Answer", text: a },
+      })),
     },
   ];
   return JSON.stringify({ "@context": "https://schema.org", "@graph": graph });
