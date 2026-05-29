@@ -100,7 +100,7 @@ export function InstallPrompt() {
   return (
     <div className={styles.popup} role="region" aria-label="Lägg till på hemskärmen">
       <span className={styles.icon} aria-hidden="true">
-        <img src="/icon-192.png" alt="" width={40} height={40} />
+        <img src="/icon-192.png?v=2" alt="" width={40} height={40} />
       </span>
       <div className={styles.body}>
         <p className={styles.title}>Lägg till på hemskärmen</p>
