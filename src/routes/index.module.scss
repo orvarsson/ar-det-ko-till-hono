@@ -236,6 +236,51 @@
   }
 }
 
+// Simple FAQ at the bottom. Left-aligned for readability (the rest of the page
+// is centered) and width-capped so lines stay comfortable on wide screens.
+.faq {
+  width: 100%;
+  max-width: 560px;
+  margin-top: 32px;
+  text-align: left;
+}
+
+.faqHeading {
+  font-family: var(--font-sans);
+  font-weight: 600;
+  font-size: 1rem;
+  color: var(--ink);
+  text-align: center;
+  margin: 0 0 16px;
+}
+
+.faqList {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.faqItem {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.faqQuestion {
+  font-family: var(--font-sans);
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--ink);
+}
+
+.faqAnswer {
+  margin: 0;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: var(--ink-soft);
+}
+
 .footer {
   padding-top: 16px;
   display: flex;

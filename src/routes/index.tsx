@@ -36,9 +36,10 @@ const SOCIAL_META: Record<LoadedStatus["direction"], SocialMeta> = {
   },
 };
 
-// Direction-specific Q&A used for FAQPage structured data. Kept truthful so the
-// schema stays accurate: Hönöleden is a free state ferry run by Trafikverkets
-// Färjerederi between Lilla Varholmen and Hönö Pinan.
+// Direction-specific Q&A, rendered as the visible FAQ at the bottom of the
+// page and fed into the FAQPage structured data so the schema matches what
+// users actually see. Kept truthful: Hönöleden is a free state ferry run by
+// Trafikverkets Färjerederi between Lilla Varholmen and Hönö Pinan.
 const FAQ: Record<LoadedStatus["direction"], { q: string; a: string }[]> = {
   "to-hono": [
     {
@@ -240,6 +241,18 @@ function QueuePage() {
           Se hela tidtabellen på Hönöleden.se →
         </a>
       </main>
+
+      <section className={styles.faq} aria-label="Vanliga frågor">
+        <h2 className={styles.faqHeading}>Vanliga frågor</h2>
+        <dl className={styles.faqList}>
+          {FAQ[direction].map(({ q, a }) => (
+            <div key={q} className={styles.faqItem}>
+              <dt className={styles.faqQuestion}>{q}</dt>
+              <dd className={styles.faqAnswer}>{a}</dd>
+            </div>
+          ))}
+        </dl>
+      </section>
 
       <footer className={styles.footer} role="contentinfo">
         <a className={styles.crossLink} href={other.canonicalUrl}>
