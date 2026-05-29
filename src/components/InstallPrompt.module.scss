@@ -1,0 +1,117 @@
+// Native-install-banner-style popup pinned to the bottom of the viewport.
+// Respects the iOS safe-area inset so it clears the home indicator.
+.popup {
+  position: fixed;
+  left: 12px;
+  right: 12px;
+  bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+  z-index: 50;
+
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  max-width: 440px;
+  margin-inline: auto;
+  padding: 12px 14px;
+
+  border-radius: 16px;
+  background: color-mix(in oklch, var(--bg) 88%, white);
+  border: 1px solid color-mix(in oklch, var(--ink) 12%, transparent);
+  box-shadow: 0 8px 30px color-mix(in oklch, var(--ink) 22%, transparent);
+
+  animation: slide-up 240ms ease-out both;
+}
+
+@keyframes slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .popup {
+    animation: none;
+  }
+}
+
+.icon {
+  flex-shrink: 0;
+  line-height: 0;
+
+  img {
+    border-radius: 10px;
+    display: block;
+  }
+}
+
+.body {
+  flex: 1;
+  min-width: 0;
+  text-align: left;
+}
+
+.title {
+  font-family: var(--font-sans);
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--ink);
+  margin: 0;
+}
+
+.text {
+  font-size: 0.8rem;
+  line-height: 1.35;
+  color: var(--ink-soft);
+  margin: 2px 0 0;
+}
+
+.shareGlyph {
+  width: 1em;
+  height: 1em;
+  vertical-align: -0.15em;
+  color: var(--ink);
+}
+
+.install {
+  flex-shrink: 0;
+  font-family: var(--font-sans);
+  font-weight: 600;
+  font-size: 0.85rem;
+  color: white;
+  background: var(--ink);
+  border: none;
+  border-radius: 999px;
+  padding: 8px 16px;
+  min-height: 40px;
+  cursor: pointer;
+
+  &:hover {
+    background: color-mix(in oklch, var(--ink) 85%, black);
+  }
+}
+
+.close {
+  flex-shrink: 0;
+  align-self: flex-start;
+  font-size: 1.25rem;
+  line-height: 1;
+  color: var(--ink-soft);
+  background: none;
+  border: none;
+  cursor: pointer;
+  // ≥44px tap target without inflating the visible glyph.
+  width: 32px;
+  height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  &:hover {
+    color: var(--ink);
+  }
+}
